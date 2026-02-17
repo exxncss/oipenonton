@@ -2,61 +2,323 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<title>Three Years of Us</title>
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Three Years of Us</title>
 
-<link rel="stylesheet" href="css/style.css">
+<link href="https://fonts.googleapis.com/css2?family=Marcellus&family=Inter:wght@300;400;500&display=swap" rel="stylesheet">
 
-<link href="https://fonts.googleapis.com/css2?family=Marcellus&family=Outfit:wght@300;400;500&display=swap" rel="stylesheet">
+<style>
+
+/* ===============================
+   BASE
+================================ */
+
+body{
+margin:0;
+height:100vh;
+display:flex;
+justify-content:center;
+align-items:center;
+background:#f8f8f8;
+font-family:'Inter', sans-serif;
+overflow:hidden;
+}
+
+.landing-container{
+text-align:center;
+max-width:500px;
+padding:20px;
+}
+
+h1{
+font-family:'Marcellus', serif;
+font-size:42px;
+margin-bottom:10px;
+}
+
+.subtitle{
+opacity:.7;
+margin-bottom:30px;
+}
+
+.btn{
+padding:12px 28px;
+border:none;
+border-radius:8px;
+background:black;
+color:white;
+cursor:pointer;
+font-size:14px;
+transition:.3s ease;
+}
+
+.btn:hover{
+opacity:.8;
+}
+
+/* ===============================
+   TROLL OVERLAY
+================================ */
+
+.troll-overlay{
+position:fixed;
+top:0;
+left:0;
+width:100%;
+height:100%;
+background:rgba(255,255,255,0.97);
+display:flex;
+justify-content:center;
+align-items:center;
+opacity:0;
+pointer-events:none;
+transition:.4s ease;
+z-index:5000;
+}
+
+.troll-overlay.active{
+opacity:1;
+pointer-events:auto;
+}
+
+.troll-box{
+text-align:center;
+max-width:400px;
+padding:20px;
+}
+
+.troll-box h2{
+font-family:'Marcellus', serif;
+font-size:32px;
+margin-bottom:30px;
+transition:.3s ease;
+}
+
+.fade{
+opacity:0;
+transform:translateY(-10px);
+}
+
+.troll-buttons{
+display:flex;
+gap:20px;
+justify-content:center;
+position:relative;
+height:120px;
+align-items:center;
+}
+
+.troll-buttons button{
+padding:10px 24px;
+border:none;
+border-radius:8px;
+cursor:pointer;
+transition:.25s ease;
+font-size:14px;
+}
+
+#yesBtn{
+background:black;
+color:white;
+}
+
+#yesBtn:hover{
+opacity:.85;
+}
+
+#noBtn{
+background:#eaeaea;
+position:relative;
+}
+
+#trollText{
+margin-top:15px;
+font-size:14px;
+opacity:0;
+transition:.3s ease;
+}
+
+/* ===============================
+   ANSWER AREA
+================================ */
+
+#answerArea{
+display:none;
+margin-top:10px;
+}
+
+#answerInput{
+padding:10px;
+border:1px solid #ccc;
+border-radius:6px;
+width:150px;
+}
+
+#submitAnswer{
+padding:10px 18px;
+border:none;
+border-radius:6px;
+background:black;
+color:white;
+cursor:pointer;
+margin-left:10px;
+}
+
+#submitAnswer:hover{
+opacity:.85;
+}
+
+#errorText{
+margin-top:12px;
+font-size:14px;
+color:#c0392b;
+opacity:0;
+transition:.3s ease;
+}
+
+</style>
 </head>
 
-<body class="landing-body">
+<body>
 
-<div class="progress-bar"></div>
-
+<!-- LANDING -->
 <div class="landing-container">
   <h1>
-    Three Years of Us <span id="love-emoji"></span>
+    Three Years of Us 💖
   </h1>
-
   <p class="subtitle">a small space for our big story</p>
-
   <button class="btn" id="startBtn">Start Reading</button>
 </div>
 
-<!-- Troll Modal -->
-<div class="modal" id="trollModal">
+<!-- TROLL OVERLAY -->
+<div class="troll-overlay" id="trollOverlay">
+  <div class="troll-box">
 
-  <div class="modal-box">
-    <p id="questionText">Are you sure?</p>
+    <h2 id="question">Are you sure?</h2>
 
-    <div class="modal-actions" id="modalActions">
-      <button onclick="nextStep()">Yes</button>
-      <button onclick="closeModal()">No</button>
+    <div class="troll-buttons" id="buttonArea">
+      <button id="yesBtn">Yes</button>
+      <button id="noBtn">No</button>
     </div>
 
-    <div id="mathBox" style="display:none;">
-      <p>1 + 1 = ?</p>
-      <input type="text" id="answerInput" />
-      <button onclick="checkAnswer()">Submit</button>
-      <p id="errorMsg"></p>
+    <div id="answerArea">
+      <input type="text" id="answerInput" placeholder="Your answer...">
+      <button id="submitAnswer">Submit</button>
+      <div id="errorText">Hmm... try again.</div>
     </div>
+
+    <div id="trollText">Nice try.</div>
 
   </div>
-
 </div>
 
-<script src="js/script.js"></script>
-
-<!-- Redirect ke countdown sebelum hari H -->
 <script>
-  // ===== SET TARGET DATE =====
-  const targetDate = new Date("March 18, 2025 00:00:00").getTime();
-  const now = new Date().getTime();
+document.addEventListener("DOMContentLoaded", function(){
 
-  if (now < targetDate) {
-    window.location.href = "countdown.html";
-  }
+const startBtn = document.getElementById("startBtn");
+const trollOverlay = document.getElementById("trollOverlay");
+
+const question = document.getElementById("question");
+const yesBtn = document.getElementById("yesBtn");
+const noBtn = document.getElementById("noBtn");
+
+const buttonArea = document.getElementById("buttonArea");
+const answerArea = document.getElementById("answerArea");
+const answerInput = document.getElementById("answerInput");
+const submitAnswer = document.getElementById("submitAnswer");
+const errorText = document.getElementById("errorText");
+
+const trollText = document.getElementById("trollText");
+const container = document.querySelector(".troll-buttons");
+
+let stage = 1;
+let noScale = 1;
+
+/* OPEN TROLL */
+startBtn.addEventListener("click", ()=>{
+trollOverlay.classList.add("active");
+});
+
+/* YES FLOW */
+yesBtn.addEventListener("click", ()=>{
+
+if(stage === 1){
+question.classList.add("fade");
+setTimeout(()=>{
+question.innerText = "Are you really sure?";
+question.classList.remove("fade");
+},300);
+stage = 2;
+}
+
+else if(stage === 2){
+question.classList.add("fade");
+setTimeout(()=>{
+question.innerText = "Okay... 1 + 1 = ?";
+question.classList.remove("fade");
+},300);
+
+buttonArea.style.display = "none";
+answerArea.style.display = "block";
+answerInput.focus();
+
+stage = 3;
+}
+
+});
+
+/* ANSWER CHECK */
+submitAnswer.addEventListener("click", checkAnswer);
+answerInput.addEventListener("keypress", function(e){
+if(e.key === "Enter") checkAnswer();
+});
+
+function checkAnswer(){
+const value = answerInput.value.trim().toLowerCase();
+
+if(value === "2" || value === "two" || value === "us" || value === "we"){
+window.location.href = "story1.html";
+} else {
+errorText.style.opacity = 1;
+setTimeout(()=>{ errorText.style.opacity = 0; }, 1500);
+}
+}
+
+/* NO CHAOS */
+function moveButton(){
+
+const rect = container.getBoundingClientRect();
+const btnRect = noBtn.getBoundingClientRect();
+
+const maxX = rect.width - btnRect.width;
+const maxY = rect.height - btnRect.height;
+
+const randomX = Math.random() * maxX;
+const randomY = Math.random() * maxY;
+
+noBtn.style.position = "absolute";
+noBtn.style.left = randomX + "px";
+noBtn.style.top = randomY + "px";
+
+noScale -= 0.1;
+if(noScale < 0.4) noScale = 0.4;
+noBtn.style.transform = `scale(${noScale})`;
+
+trollText.style.opacity = 1;
+setTimeout(()=>{ trollText.style.opacity = 0; }, 800);
+}
+
+noBtn.addEventListener("mouseenter", moveButton);
+noBtn.addEventListener("touchstart", function(e){
+e.preventDefault();
+moveButton();
+});
+noBtn.addEventListener("click", function(e){
+e.preventDefault();
+moveButton();
+});
+
+});
 </script>
 
 </body>
